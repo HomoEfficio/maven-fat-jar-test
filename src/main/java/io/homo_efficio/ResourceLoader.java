@@ -3,6 +3,7 @@ package io.homo_efficio;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -35,6 +36,12 @@ public class ResourceLoader {
         log.info("content root: {}", rootPath);
         URL resourceURL = this.getClass().getResource(root + resourcePath.toString());
         log.info("resourceURL: {}", resourceURL);
+
+        Object urlContent = resourceURL.getContent();
+        log.info("urlContent: {}", urlContent);
+        byte[] bytesFromUrl = ((BufferedInputStream) urlContent).readAllBytes();
+        log.info("bytes from urlContent: {}", new String(bytesFromUrl, StandardCharsets.UTF_8));
+
         log.info("resourceURL.getPath(): {}", resourceURL.getPath());
         // path.resolve(Path또는String) 는 인자가
         //   절대경로면 그냥 그 인자에 해당하는 Path 를 반환
