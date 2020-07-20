@@ -17,8 +17,10 @@ public class App {
 
         ResourceLoader resourceLoader = new ResourceLoader("/static", Path.of("/static"));
 
-        resourceLoader.loadResource("/folder1/sample");
+        resourceLoader.loadResourceAsStream("/folder1/sample1");
 
-        resourceLoader.loadResource(Path.of("/folder1/sample"));
+        resourceLoader.loadResource("/folder1/sample1");
+
+        resourceLoader.loadResource(Path.of("/folder1/sample1"));
     }
 }

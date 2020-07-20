@@ -3,13 +3,12 @@ package io.homo_efficio;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * @author homo.efficio@gmail.com
@@ -22,7 +21,7 @@ public class ResourceLoader {
     private final String root;
     private final Path rootPath;
 
-    public void loadResource(String resourceLocation) throws IOException {
+    public void loadResourceAsStream(String resourceLocation) throws IOException {
         log.info("OOO getResourceAsStream() 방식");
         log.info("content root: {}", root);
         InputStream resourceAsStream = this.getClass().getResourceAsStream(root + resourceLocation);
@@ -32,7 +31,7 @@ public class ResourceLoader {
     }
 
     public void loadResource(Path resourcePath) throws IOException {
-        log.info("*** getResourceAsStream() 방식");
+        log.info("*** getResource() + URL 방식");
         log.info("content root: {}", rootPath);
         URL resourceURL = this.getClass().getResource(root + resourcePath.toString());
         log.info("resourceURL: {}", resourceURL);
@@ -50,5 +49,18 @@ public class ResourceLoader {
         log.info("resourceLocation: {}", resolvedResourcePath);
         byte[] bytes = Files.readAllBytes(resolvedResourcePath);
         log.info("resource contents: {}", new String(bytes, StandardCharsets.UTF_8));
+    }
+
+    public void loadResource(String resourceLocation) throws IOException {
+        log.info("*** getResource() + File 방식");
+        log.info("content root: {}", rootPath);
+        log.info("resourceLocation: {}", resourceLocation);
+        String fileLocation = this.getClass().getResource(root + resourceLocation).getFile();
+        log.info("fileLocation from URL: {}", fileLocation);
+        File file = new File(fileLocation);
+        FileReader fileReader = new FileReader(file);
+        char[] chars = new char[(int) file.length()];
+        fileReader.read(chars);
+        log.info("resource contents: {}", new String(chars));
     }
 }
