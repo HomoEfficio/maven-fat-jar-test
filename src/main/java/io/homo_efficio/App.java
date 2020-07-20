@@ -16,6 +16,9 @@ public class App {
         log.info("maven으로 만든 fat-jar에서 logback + slf4j 정상 동작함");
 
         ResourceLoader resourceLoader = new ResourceLoader("/static", Path.of("/static"));
+
         resourceLoader.loadResource("/folder1/sample");
+
+        resourceLoader.loadResource(Path.of("/folder1/sample"));
     }
 }
