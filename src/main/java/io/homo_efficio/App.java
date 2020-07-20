@@ -13,14 +13,8 @@ import java.nio.file.Path;
 public class App {
 
     public static void main(String[] args) throws IOException {
-        log.info("maven으로 만든 fat-jar에서 logback + slf4j 정상 동작함");
-
-        ResourceLoader resourceLoader = new ResourceLoader("/static", Path.of("/static"));
-
-        resourceLoader.loadResourceAsStream("/folder1/sample1");
-
-        resourceLoader.loadResource("/folder1/sample1");
-
-        resourceLoader.loadResource(Path.of("/folder1/sample1"));
+        ResourceLoader resourceLoader =
+                new ResourceLoader("/static", Path.of("/static"));
+        resourceLoader.loadResourceAsFile("/folder1/sample1");
     }
 }
