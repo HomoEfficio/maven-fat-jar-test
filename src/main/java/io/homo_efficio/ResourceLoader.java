@@ -4,13 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
 /**
@@ -74,6 +72,26 @@ public class ResourceLoader {
             log.info("tags in config: [{}]", String.join(", ", config.getTags()));
         } catch (IOException e) {
             throw new RuntimeException("설정 파일 로딩에 실패했습니다.", e);
+        }
+    }
+
+    public void loadProperties(String resourceLocation) {
+        log.info("*** getResource() + Properties File 방식");
+        log.info("content root: {}", rootPath);
+        log.info("resourceLocation: {}", resourceLocation);
+
+        URL propsURL = this.getClass().getResource(root + resourceLocation);
+        log.info("resourceURL: {}", propsURL);
+
+        Properties properties = new Properties();
+
+        try {
+//            properties.load(new FileReader(propsURL.getFile()));
+            properties.load(propsURL.openStream());
+            log.info("title in props: {}", properties.getProperty("title"));
+            log.info("description in props: {}", properties.getProperty("description"));
+        } catch (IOException e) {
+            throw new RuntimeException("properties 파일 로딩에 실패했습니다.", e);
         }
     }
 }
