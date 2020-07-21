@@ -1,5 +1,6 @@
 package io.homo_efficio;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -10,6 +11,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.stream.Collectors;
 
 /**
  * @author homo.efficio@gmail.com
@@ -55,5 +57,23 @@ public class ResourceLoader {
         InputStream resourceAsStream = this.getClass().getResourceAsStream(root + resourceLocation);
         byte[] bytes = resourceAsStream.readAllBytes();
         log.info("resource contents: {}", new String(bytes, StandardCharsets.UTF_8));
+    }
+
+    public void loadConfig(String resourceLocation) {
+        log.info("*** getResource() + Jackson 방식");
+        log.info("content root: {}", rootPath);
+        log.info("resourceLocation: {}", resourceLocation);
+
+        URL configURL = this.getClass().getResource(root + resourceLocation);
+        log.info("resourceURL: {}", configURL);
+
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            Config config = objectMapper.readValue(configURL, Config.class);
+            log.info("title in config: {}", config.getTitle());
+            log.info("tags in config: [{}]", String.join(", ", config.getTags()));
+        } catch (IOException e) {
+            throw new RuntimeException("설정 파일 로딩에 실패했습니다.", e);
+        }
     }
 }
