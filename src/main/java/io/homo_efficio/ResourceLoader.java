@@ -4,12 +4,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.Properties;
-import java.util.stream.Collectors;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.jar.JarFile;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * @author homo.efficio@gmail.com
@@ -93,5 +97,58 @@ public class ResourceLoader {
         } catch (IOException e) {
             throw new RuntimeException("properties 파일 로딩에 실패했습니다.", e);
         }
+    }
+
+    public void loadDirectoryAsStream(String dir) throws IOException {
+        log.info("OOO getResourceAsStream() + Directory");
+        log.info("content root: {}", root);
+        log.info("dir: {}", dir);
+
+        // IDE 에서는 잘 동작, jar 에서는 에러는 발생하지 않으나 esourceAsStream.readAllBytes() 값이 비어있음
+        log.info("USING naive getResourceAsStream(String directory) -----");
+        InputStream resourceAsStream = this.getClass().getResourceAsStream(root + dir);
+        byte[] bytes = resourceAsStream.readAllBytes();
+        log.info("resource contents length: {}", bytes.length);
+        if (bytes.length > 0) {
+            log.info("resource contents: {}", new String(bytes, StandardCharsets.UTF_8));
+        } else {
+            // jar 에서는 잘 동작
+            // IDE 에서는 예외 발생: java.io.FileNotFoundException: /Users/1003604/gitRepo/study/maven-fat-jar-test/target/classes/io/homo_efficio (Is a directory)
+            // 따라서 bytes.length = 0 일 때만 실행하도록
+            log.info("USING JarFile -----");
+            String path = this.getClass().getResource("").getPath();
+            log.info("resourcePath: {}", path);
+            int exclamationIndex = path.lastIndexOf("!") > 0 ? path.lastIndexOf("!") : path.length();
+            String jarFilePath = path.substring(0, exclamationIndex).replaceAll("file:", "");
+            log.info("jarFilePath : {}", jarFilePath);
+            LocalDateTime start = LocalDateTime.now();
+            log.info("jarFile start: {}", start);
+            JarFile jarFile = new JarFile(jarFilePath);
+            LocalDateTime end = LocalDateTime.now();
+            log.info("jarFile end  : {}", end);
+            enumerationAsStream(jarFile.entries())
+                    .filter(entry -> entry.getRealName().startsWith((root + dir).substring(1)))
+                    .forEach(entry -> log.info("jarEntry: {}", entry.getRealName()));
+        }
+    }
+
+    // From https://stackoverflow.com/a/23276455
+    static <T> Stream<T> enumerationAsStream(Enumeration<T> e) {
+        return StreamSupport.stream(
+                Spliterators.spliteratorUnknownSize(
+                        new Iterator<T>() {
+                            @Override
+                            public boolean hasNext() {
+                                return e.hasMoreElements();
+                            }
+
+                            @Override
+                            public T next() {
+                                return e.nextElement();
+                            }
+                        },
+                        Spliterator.ORDERED
+                ), false
+        );
     }
 }

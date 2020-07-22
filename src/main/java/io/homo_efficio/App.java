@@ -20,5 +20,6 @@ public class App {
         resourceLoader.loadResourceAsStream("/folder1/sample1");
         resourceLoader.loadConfig("/folder1/config.json");
         resourceLoader.loadProperties("/folder2/my.properties");
+        resourceLoader.loadDirectoryAsStream("/folder1");
     }
 }
